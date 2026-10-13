@@ -1,0 +1,241 @@
+🛡️ CIPHERTRAP VIVA - SUPER SIMPLE ONE-COMMANDS!
+═══════════════════════════════════════════════════════════════════
+
+✨ NEW FEATURE: NOW WITH YOUR OWN IMPORTANT FILES!
+
+SETUP (First Time Only):
+═══════════════════════════════════════════════════════════════════
+
+1. Extract zip:
+   unzip CipherTrap_READY_TO_RUN.zip
+
+2. Go to folder:
+   cd CipherTrap
+
+3. Install (takes 1-2 minutes):
+   pip install -r requirements.txt && pip install pytest
+
+4. Test (should show ✅ 12 passed):
+   python -m pytest tests/test_ciphertrap.py -v
+
+═══════════════════════════════════════════════════════════════════
+
+OPTION 1: DEMO WITH YOUR OWN IMPORTANT FILES ⭐ (RECOMMENDED!)
+═══════════════════════════════════════════════════════════════════
+
+This is MUCH better for judges - show real business files!
+
+STEP 1: Create folder with YOUR important files:
+   mkdir my_important_files
+
+STEP 2: Copy YOUR files into it:
+   cp ~/Documents/project_report.pdf my_important_files/
+   cp ~/Desktop/financial_data.xlsx my_important_files/
+   cp ~/Pictures/client_proposal.pptx my_important_files/
+
+STEP 3: YOUR VIVA DEMO (Use 3 Terminals):
+═══════════════════════════════════════════════════════════════════
+
+🎯 TERMINAL 1: START DASHBOARD
+───────────────────────────────────────────────────────────────────
+
+ONE SIMPLE COMMAND:
+
+python dashboard/app.py my_important_files
+
+Then open browser:
+http://127.0.0.1:5000
+
+[Keep this running! Don't close it!]
+
+
+🎯 TERMINAL 2: BACKUP YOUR IMPORTANT FILES
+───────────────────────────────────────────────────────────────────
+
+ONE SIMPLE COMMAND:
+
+python backup_my_files.py
+
+✅ You'll see:
+   ✅ Snapshot created: snap_XXXXX
+   ✅ Files backed up: 3
+   
+   📋 YOUR FILES:
+      ✓ project_report.pdf
+      ✓ financial_data.xlsx
+      ✓ client_proposal.pptx
+   
+   ⚠️  COPY THIS SNAPSHOT ID! (You need it later)
+
+
+🎯 TERMINAL 2: SHOW YOUR FILES IN FILE EXPLORER (Before Attack)
+───────────────────────────────────────────────────────────────────
+
+Open file explorer:
+CipherTrap/my_important_files/
+
+✅ You'll see your actual important files (readable)
+
+Double-click one to show it's readable!
+
+Tell judges: "These are MY important business files that I want to protect."
+
+
+🎯 TERMINAL 2: RUN ATTACK ON YOUR FILES
+───────────────────────────────────────────────────────────────────
+
+ONE SIMPLE COMMAND:
+
+python tests/simulate_attack.py my_important_files
+
+✅ Watch Terminal 1 Dashboard as it updates!
+   Risk score: 0 → 50 → 85 🔴
+   
+⏱️ Takes about 30 seconds
+
+
+🎯 TERMINAL 2: SHOW ENCRYPTED FILES IN FILE EXPLORER
+───────────────────────────────────────────────────────────────────
+
+Refresh file explorer (F5 or Cmd+R):
+CipherTrap/my_important_files/
+
+✅ Files still exist but are ENCRYPTED GARBAGE
+
+Double-click one to show encrypted gibberish!
+
+Tell judges: "My important business files are now encrypted by ransomware!"
+
+
+🎯 TERMINAL 3: RECOVER YOUR IMPORTANT FILES
+───────────────────────────────────────────────────────────────────
+
+Replace SNAPSHOT_ID with the one you copied from Terminal 2!
+
+ONE SIMPLE COMMAND:
+
+python recovery_my_files.py SNAPSHOT_ID
+
+Example (if your snapshot ID is snap_a1b2c3d4e5f6):
+
+python recovery_my_files.py snap_a1b2c3d4e5f6
+
+✅ You'll see:
+   ✅ RECOVERY SUCCESSFUL!
+   ✅ Files restored: 3
+   ✓ project_report.pdf
+   ✓ financial_data.xlsx
+   ✓ client_proposal.pptx
+
+
+🎯 TERMINAL 3: SHOW RECOVERED FILES IN FILE EXPLORER
+───────────────────────────────────────────────────────────────────
+
+Open file explorer:
+CipherTrap/my_important_files_restored/
+
+✅ Files are perfectly RECOVERED and READABLE
+
+Double-click one to show it's readable and identical!
+
+Tell judges: "Perfect recovery! All my business files are back! 100% data integrity!"
+
+
+🎯 TERMINAL 3: SHOW UNIT TESTS
+───────────────────────────────────────────────────────────────────
+
+ONE SIMPLE COMMAND:
+
+python -m pytest tests/test_ciphertrap.py -v
+
+✅ You'll see: ✅ 12 passed
+
+Tell judges: "All 12 tests pass - production-ready code!"
+
+═══════════════════════════════════════════════════════════════════
+
+OPTION 2: DEMO WITH AUTO-GENERATED FILES (Quick & Easy)
+═══════════════════════════════════════════════════════════════════
+
+If you don't want to copy your own files, use this quick demo:
+
+TERMINAL 1:
+   python dashboard/app.py demo_folder
+
+TERMINAL 2:
+   python backup_demo.py
+   python tests/simulate_attack.py demo_folder
+
+TERMINAL 3:
+   python recovery_demo.py SNAPSHOT_ID
+   python -m pytest tests/test_ciphertrap.py -v
+
+Note: This creates 5 dummy files (document_0.txt to document_4.txt)
+
+═══════════════════════════════════════════════════════════════════
+
+COMPLETE COMMAND LIST (Copy-Paste):
+═══════════════════════════════════════════════════════════════════
+
+⭐ RECOMMENDED: USE YOUR OWN FILES (Option 1)
+
+Setup:
+    cd CipherTrap
+    pip install -r requirements.txt && pip install pytest
+    mkdir my_important_files
+    cp ~/Documents/important_file.pdf my_important_files/
+    cp ~/Desktop/financial_data.xlsx my_important_files/
+
+Terminal 1:
+    python dashboard/app.py my_important_files
+
+Terminal 2:
+    python backup_my_files.py
+    python tests/simulate_attack.py my_important_files
+
+Terminal 3:
+    python recovery_my_files.py snap_XXXXX
+    python -m pytest tests/test_ciphertrap.py -v
+
+═══════════════════════════════════════════════════════════════════
+
+QUICK DEMO: USE AUTO-GENERATED FILES (Option 2)
+
+Terminal 1:
+    python dashboard/app.py demo_folder
+
+Terminal 2:
+    python backup_demo.py
+    python tests/simulate_attack.py demo_folder
+
+Terminal 3:
+    python recovery_demo.py snap_XXXXX
+    python -m pytest tests/test_ciphertrap.py -v
+
+Setup (First time):
+    unzip CipherTrap_READY_TO_RUN.zip
+    cd CipherTrap
+    pip install -r requirements.txt && pip install pytest
+    python -m pytest tests/test_ciphertrap.py -v
+
+Viva Demo (3 terminals):
+
+Terminal 1:
+    python dashboard/app.py demo_folder
+    # Open: http://127.0.0.1:5000
+
+Terminal 2:
+    python backup_demo.py
+    python tests/simulate_attack.py demo_folder
+    cat demo_folder/document_0.txt
+
+Terminal 3:
+    python recovery_demo.py snap_XXXXX
+    cat demo_folder_restored/document_0.txt
+    python -m pytest tests/test_ciphertrap.py -v
+
+═══════════════════════════════════════════════════════════════════
+
+THAT'S IT! Super simple! 🚀
+
+═══════════════════════════════════════════════════════════════════

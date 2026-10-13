@@ -1,0 +1,212 @@
+🛡️ CIPHERTRAP VIVA DEMO - QUICK COMMAND REFERENCE
+================================================
+
+Copy-paste these commands directly for live demo. No typing errors!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TERMINAL 1: SETUP & DASHBOARD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# 1. Navigate to project
+cd CipherTrap
+
+# 2. Start the web dashboard
+python dashboard/app.py demo_folder
+
+# → You should see:
+# "CipherTrap watching: /path/to/demo_folder"
+# "Deployed 3 honeyfiles..."
+# "Flask running on http://127.0.0.1:5000"
+#
+# Keep this running in background!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TERMINAL 2: CREATE BACKUP (Before Attack)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# 1. Create initial demo files
+python -c "
+from pathlib import Path
+from core.snapshot import create_snapshot
+
+demo = Path('demo_folder')
+demo.mkdir(exist_ok=True)
+for i in range(5):
+    (demo / f'document_{i}.txt').write_text(f'Important document #{i}\\nCritical business data.\\n' * 3)
+
+snapshot = create_snapshot(demo, 'vault', 'recovery_password_123')
+print(f'✅ Snapshot: {snapshot.snapshot_id}')
+print(f'✅ Files backed up: {len(snapshot.files)}')
+"
+
+# → Copy the snapshot ID (e.g., snap_a1b2c3d4e5f6)
+# You'll need this for recovery!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TERMINAL 2: RUN ATTACK (Show judges encrypted files)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Run the ransomware attack simulation
+python tests/simulate_attack.py demo_folder
+
+# → Watch Terminal 1 Dashboard:
+#   Risk Score: 0 → 50 → 85 (🔴 RED!)
+#   Alerts appear in real-time
+#   Honeyfiles status changes to "TRIPPED"
+
+# → When done, show encrypted files:
+cat demo_folder/document_0.txt
+# You'll see: "a7f3d9e1b2c4f8e3..." (gibberish!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TERMINAL 3: RECOVERY (Prove zero-data-loss)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Restore from encrypted backup
+python -c "
+from pathlib import Path
+from core.recovery import restore_snapshot
+
+result = restore_snapshot(
+    vault_folder='vault',
+    snapshot_id='snap_a1b2c3d4e5f6',  # USE YOUR SNAPSHOT ID!
+    destination_folder='demo_folder_restored',
+    password='recovery_password_123'
+)
+
+print(f'✅ RECOVERY COMPLETE!')
+print(f'✅ Files restored: {len(result.restored_files)}')
+print(f'❌ Failed: {len(result.failed_files)}')
+for f in result.restored_files:
+    print(f'   ✓ {f}')
+"
+
+# → Now show recovered file is readable:
+cat demo_folder_restored/document_0.txt
+# You'll see: "Important document #0..." (Perfect!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TERMINAL 3 (Alternative): RUN UNIT TESTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Prove code quality with tests
+python -m pytest tests/test_ciphertrap.py -v --tb=short
+
+# → Shows 12 passing tests:
+# test_deploy_honeyfiles PASSED
+# test_honeyfile_integrity_check PASSED  
+# test_encrypt_decrypt_roundtrip PASSED
+# test_full_protection_workflow PASSED
+# ... 8 more passing tests
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BROWSER: OPEN DASHBOARD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Open in browser (while Terminal 1 running):
+http://127.0.0.1:5000
+
+Watch as risk score updates in REAL-TIME:
+- Before attack: 🟢 Normal (0)
+- Honeyfiles trigger: 🟠 High Risk (50)  
+- Encryption detected: 🔴 Destructive (85)
+
+Show judges:
+✓ Real-time risk gauge
+✓ Threat patterns detected (LockBit signature)
+✓ Honeyfile status changes
+✓ Activity timeline
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DEMO FLOW SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Dashboard running (Terminal 1)
+   └─ Show judges http://127.0.0.1:5000
+
+2. Backup created (Terminal 2)
+   └─ Create snapshot before attack
+   └─ Copy snapshot ID
+
+3. Attack simulation (Terminal 2)
+   └─ python tests/simulate_attack.py demo_folder
+   └─ Watch dashboard spike to red
+   └─ Show encrypted files (cat demo_folder/document_0.txt)
+
+4. Recovery (Terminal 3)
+   └─ Restore from vault with password
+   └─ Show files are 100% recovered
+   └─ cat demo_folder_restored/document_0.txt
+
+5. Tests (Optional Terminal 3)
+   └─ pytest tests/test_ciphertrap.py -v
+   └─ Prove code reliability
+
+Total time: ~5-10 minutes
+Impact: 🔥 MAXIMUM
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+IMPORTANT PASSWORDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Snapshot password: recovery_password_123
+Demo encryption key: demo_ransomware_key_32_bytes!!!
+
+(Keep these consistent in your commands!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DEMO TIPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Run attacks SLOWLY so judges see dashboard update
+✓ Pause between phases to explain what's happening
+✓ Point to dashboard risk score when honeyfiles trigger
+✓ Show encrypted file (hex garbage) to prove encryption worked
+✓ Show recovered file to prove 100% data recovery
+✓ Keep terminal text large (Ctrl+ zoom) for projector viewing
+
+Before viva:
+✓ Test all commands work
+✓ Verify folder paths are correct
+✓ Clear demo_folder if it has old files
+✓ Ensure internet not needed (dashboard works offline)
+✓ Have screenshot of dashboard ready as backup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JUDGE QUESTIONS & ANSWERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Q: "How does encryption work?"
+A: "We use AES-256-GCM with Argon2 key derivation. Each file 
+   gets a random 12-byte nonce, making even identical files 
+   produce different ciphertexts. We store the original SHA-256 
+   hash to verify integrity on recovery."
+
+Q: "Can you recover if vault is deleted?"
+A: "Yes - in production, we'd sync to cloud storage (AWS S3). 
+   The vault can be on a separate air-gapped network for 
+   critical systems."
+
+Q: "How is this different from regular backups?"
+A: "Traditional backups need human action. CipherTrap runs 24/7, 
+   detects attacks in seconds using honeyfiles, and restores 
+   automatically - all encrypted and integrity-verified."
+
+Q: "What about zero-day ransomware?"
+A: "Honeyfiles catch ANYTHING that tries to encrypt files. 
+   Behavioral analysis catches unknown attacks by detecting 
+   entropy spikes, mass modifications, and unusual patterns."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Best of luck with your viva! You've built something impressive. 🚀

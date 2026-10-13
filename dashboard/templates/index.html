@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CipherTrap Dashboard - Ransomware Detection & Protection</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+        font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; 
+        background: linear-gradient(135deg, #0f1115 0%, #1a1d24 100%);
+        color: #e6e6e6; 
+        padding: 20px;
+        min-height: 100vh;
+    }
+    
+    .container { max-width: 1400px; margin: 0 auto; }
+    
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #2a2e37;
+    }
+    
+    .header h1 { font-size: 32px; font-weight: 700; }
+    .header-status { text-align: right; font-size: 13px; color: #9aa0a6; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .grid-full { grid-column: 1 / -1; }
+    
+    .card { 
+        background: #1a1d24; 
+        border-radius: 12px; 
+        padding: 24px; 
+        border: 1px solid #2a2e37;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .card h3 { font-size: 14px; font-weight: 600; color: #9aa0a6; margin-bottom: 16px; text-transform: uppercase; }
+    
+    .risk-gauge {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: 700;
+        border: 6px solid;
+        box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    }
+    
+    .risk-gauge.level-0 { border-color: #3ddc84; color: #3ddc84; }
+    .risk-gauge.level-50 { border-color: #f2994a; color: #f2994a; }
+    .risk-gauge.level-100 { border-color: #eb5757; color: #eb5757; }
+    
+    .badge { 
+        display: inline-block; 
+        padding: 6px 12px; 
+        border-radius: 8px; 
+        font-size: 12px; 
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .badge-success { background: rgba(61, 220, 132, 0.2); color: #3ddc84; }
+    .badge-danger { background: rgba(235, 87, 87, 0.2); color: #eb5757; }
+    
+    .alert-box {
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        border-left: 4px solid;
+        font-size: 13px;
+    }
+    
+    .alert-danger { background: rgba(235, 87, 87, 0.1); border-left-color: #eb5757; }
+    .alert-success { background: rgba(61, 220, 132, 0.1); border-left-color: #3ddc84; }
+    
+    .item-list { list-style: none; }
+    .item-list li { 
+        padding: 10px 0; 
+        border-bottom: 1px solid #2a2e37;
+        font-size: 13px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .item-list li:last-child { border-bottom: none; }
+    
+    .chart-container { position: relative; height: 300px; margin-top: 16px; }
+    
+    .timeline-item { padding: 12px; border-left: 2px solid #2a2e37; margin-left: 12px; font-size: 12px; color: #9aa0a6; }
+    .timeline { max-height: 400px; overflow-y: auto; }
+    
+    .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2e37; color: #666; font-size: 12px; }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🛡️ CipherTrap</h1>
+                <p style="color: #9aa0a6; font-size: 13px;">Ransomware Detection & Protection System</p>
+            </div>
+            <div class="header-status">
+                <div>Monitoring: <code id="folder-path" style="color: #64b5f6;">{{ folder }}</code></div>
+                <div>Status: <span style="color: #3ddc84;">● Active</span></div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="card grid-full">
+                <h3>Real-Time Risk Assessment</h3>
+                <div style="display: flex; gap: 30px; padding: 30px; align-items: center;">
+                    <div class="risk-gauge" id="risk-gauge">--</div>
+                    <div>
+                        <h2 id="risk-level">Loading...</h2>
+                        <p style="color: #9aa0a6;">Current threat level</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Detection Alerts</h3>
+                <div id="alerts-container"></div>
+            </div>
+            
+            <div class="card">
+                <h3>Suspicious Patterns Detected</h3>
+                <div id="patterns-container"></div>
+            </div>
+            
+            <div class="card">
+                <h3>Honeyfile Traps</h3>
+                <ul class="item-list" id="honeyfile-list"></ul>
+            </div>
+            
+            <div class="card grid-full">
+                <h3>Activity Timeline</h3>
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Backup Snapshots</h3>
+                <div id="snapshot-list"></div>
+            </div>
+            
+            <div class="card">
+                <h3>Audit Chain Status</h3>
+                <div id="chain-status"></div>
+            </div>
+            
+            <div class="card grid-full">
+                <h3>Recent Activity</h3>
+                <div class="timeline" id="audit-entries"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>CipherTrap • Ransomware Detection & Recovery | Last update: <span id="last-update">--:--:--</span></p>
+        </div>
+    </div>
+
+<script>
+let activityChart = null;
+
+function getRiskLevel(score) {
+    if (score >= 80) return "🔴 CRITICAL THREAT";
+    if (score >= 60) return "🟠 HIGH RISK";
+    if (score >= 40) return "🟡 SUSPICIOUS";
+    if (score >= 20) return "🟡 MINOR ALERTS";
+    return "🟢 NORMAL";
+}
+
+function getRiskClass(score) {
+    if (score >= 80) return "level-100";
+    if (score >= 40) return "level-50";
+    return "level-0";
+}
+
+async function refreshStatus() {
+    try {
+        const res = await fetch("/api/status");
+        const data = await res.json();
+
+        const gauge = document.getElementById("risk-gauge");
+        gauge.textContent = data.risk_score;
+        gauge.className = `risk-gauge ${getRiskClass(data.risk_score)}`;
+        document.getElementById("risk-level").textContent = getRiskLevel(data.risk_score);
+        
+        const alertsContainer = document.getElementById("alerts-container");
+        if (data.reasons && data.reasons.length > 0) {
+            alertsContainer.innerHTML = data.reasons.map(r => 
+                `<div class="alert-box alert-danger">⚠️ ${r}</div>`
+            ).join("");
+        } else {
+            alertsContainer.innerHTML = '<div class="alert-box alert-success">✅ No threats detected</div>';
+        }
+        
+        const patternsContainer = document.getElementById("patterns-container");
+        if (data.suspicious_patterns && data.suspicious_patterns.length > 0) {
+            patternsContainer.innerHTML = data.suspicious_patterns.map(p =>
+                `<div style="padding: 8px; background: rgba(235,87,87,0.1); border-left: 3px solid #eb5757; margin: 8px 0; border-radius: 4px;"><strong>${p.malware}</strong>: ${p.description}</div>`
+            ).join("");
+        } else {
+            patternsContainer.innerHTML = '<p style="color: #9aa0a6;">No malware signatures detected</p>';
+        }
+        
+        const honeyfileList = document.getElementById("honeyfile-list");
+        honeyfileList.innerHTML = data.honeyfiles.map(h => `
+            <li>
+                <span>🍯 ${h.name}</span>
+                <span class="badge ${h.compromised ? 'badge-danger' : 'badge-success'}">${h.compromised ? 'TRIPPED ⚠️' : 'Safe ✓'}</span>
+            </li>
+        `).join("");
+        
+        const snapshotList = document.getElementById("snapshot-list");
+        snapshotList.innerHTML = data.snapshots && data.snapshots.length > 0
+            ? `<span style="color: #3ddc84;">✓ ${data.snapshots.length} backups</span><br/>${data.snapshots.slice(0, 3).map(s => `<span class="badge badge-success">${s}</span>`).join("")}`
+            : '<p style="color: #9aa0a6;">No snapshots. Create one to enable recovery.</p>';
+        
+        document.getElementById("last-update").textContent = new Date().toLocaleTimeString();
+    } catch (e) {
+        console.error("Error:", e);
+    }
+}
+
+async function refreshAuditLog() {
+    try {
+        const res = await fetch("/api/audit-log");
+        const data = await res.json();
+        document.getElementById("chain-status").innerHTML = data.chain_verified
+            ? "<span style='color: #3ddc84;'>✓ Audit chain verified</span>"
+            : `<span style='color: #eb5757;'>⚠ TAMPERED at ${data.first_bad_index}</span>`;
+
+        const entries = document.getElementById("audit-entries");
+        entries.innerHTML = data.entries && data.entries.length > 0
+            ? data.entries.slice().reverse().slice(0, 20).map(e => 
+                `<div class="timeline-item">[${new Date(e.timestamp * 1000).toLocaleTimeString()}] ${e.event_type}</div>`
+            ).join("")
+            : '<p style="color: #9aa0a6;">No activity yet</p>';
+    } catch (e) {
+        console.error("Error:", e);
+    }
+}
+
+function initChart() {
+    const ctx = document.getElementById("activityChart").getContext("2d");
+    activityChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Risk Score', data: [], borderColor: '#64b5f6', backgroundColor: 'rgba(100,181,246,0.1)', borderWidth: 2, fill: true, tension: 0.3 }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { min: 0, max: 100, ticks: { color: '#9aa0a6' }, grid: { color: '#2a2e37' } }, x: { ticks: { color: '#9aa0a6' }, grid: { color: '#2a2e37' } } }
+        }
+    });
+}
+
+initChart();
+refreshStatus();
+refreshAuditLog();
+setInterval(refreshStatus, 2000);
+setInterval(refreshAuditLog, 4000);
+</script>
+</body>
+</html>
