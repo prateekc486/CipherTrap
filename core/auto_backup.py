@@ -137,7 +137,7 @@ class SnapshotScheduler:
 
 
 # Preset schedules
-HOURLY_BACKUP = BackupSchedule(interval_seconds=3600)  # Every hour
+HOURLY_BACKUP = BackupSchedule(interval_seconds=600)  # Every 10 minutes (for presentation)
 DAILY_BACKUP = BackupSchedule(interval_seconds=86400)  # Every 24 hours
 WEEKLY_BACKUP = BackupSchedule(interval_seconds=604800)  # Every 7 days
 AGGRESSIVE_BACKUP = BackupSchedule(interval_seconds=300, max_snapshots=20)  # Every 5 min (demo)
