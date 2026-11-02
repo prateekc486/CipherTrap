@@ -31,7 +31,7 @@ from core.integrity import AuditLog
 from core.snapshot import list_snapshots
 from core.threat_intelligence import detect_malware_signature, is_likely_encrypted
 from core.auto_backup import SnapshotScheduler, DEFAULT_BACKUP
-from core.config import get_vault_password
+from core.config import VAULT_DIR, get_vault_password
 
 app = Flask(__name__)
 
@@ -198,12 +198,8 @@ def api_audit_log():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python dashboard/app.py /path/to/protected_folder [/path/to/vault]")
-        sys.exit(1)
+    folder_arg = sys.argv[1] if len(sys.argv) > 1 else "my_important_files"
 
-    folder_arg = sys.argv[1]
-    vault_arg = sys.argv[2] if len(sys.argv) > 2 else str(Path(__file__).parent.parent / "vault" / "snapshots")
-
-    init_monitoring(folder_arg, vault_arg)
+    # Same vault as backup_my_files.py, so new snapshots show up here.
+    init_monitoring(folder_arg, str(VAULT_DIR))
     app.run(debug=False, port=5000)
