@@ -22,21 +22,20 @@ from dataclasses import dataclass
 import logging
 
 from core.snapshot import create_snapshot, list_snapshots, SnapshotManifest
-from core.risk_engine import score_activity
+from core.config import BACKUP_INTERVAL_SECONDS, MAX_SNAPSHOTS
+from core.honeyfiles import HONEYFILE_NAMES
 
 
 @dataclass
 class BackupSchedule:
     """Configuration for automated backups."""
-    interval_seconds: int  # How often to create backups (3600 = hourly)
-    max_snapshots: int = 10  # Keep only this many recent snapshots
-    abort_on_risk_score: int = 60  # Don't backup if risk score >= this
-    password: str = None  # Password for encrypted snapshots
+    interval_seconds: int  # How often to create backups
+    max_snapshots: int = MAX_SNAPSHOTS  # Keep only this many recent snapshots
 
 
 class SnapshotScheduler:
     """Manages automated snapshot creation."""
-    
+
     def __init__(self, schedule: BackupSchedule):
         self.schedule = schedule
         self.is_running = False
@@ -44,15 +43,19 @@ class SnapshotScheduler:
         self.last_snapshot_time = None
         self.snapshot_count = 0
         self.logger = logging.getLogger(__name__)
-    
-    def start(self, source_folder: str | Path, vault_folder: str | Path) -> None:
+
+    def start(self, source_folder: str | Path, vault_folder: str | Path, password: str) -> None:
         """Start the backup scheduler."""
         if self.is_running:
             return
-        
+
+        if not password:
+            raise ValueError("A vault password is required for automated backups.")
+
         self.is_running = True
         self.source_folder = Path(source_folder)
         self.vault_folder = Path(vault_folder)
+        self.password = password
         
         self.thread = threading.Thread(
             target=self._scheduler_loop,
@@ -83,16 +86,12 @@ class SnapshotScheduler:
         Create a snapshot if conditions are met.
         Returns the snapshot manifest if created, None otherwise.
         """
-        # Check if we should skip due to risk
-        # (In a real implementation, we'd query the risk engine here)
-        
-        # Create snapshot
         try:
             snapshot = create_snapshot(
                 source_folder=self.source_folder,
                 vault_folder=self.vault_folder,
-                password=self.schedule.password or "default_password",
-                exclude_names={"passwords_backup.txt", "financial_records_2024.xlsx"}  # Exclude honeyfiles
+                password=self.password,
+                exclude_names=set(HONEYFILE_NAMES),
             )
             
             self.snapshot_count += 1
@@ -136,11 +135,8 @@ class SnapshotScheduler:
         }
 
 
-# Preset schedules
-HOURLY_BACKUP = BackupSchedule(interval_seconds=600)  # Every 10 minutes (for presentation)
-DAILY_BACKUP = BackupSchedule(interval_seconds=86400)  # Every 24 hours
-WEEKLY_BACKUP = BackupSchedule(interval_seconds=604800)  # Every 7 days
-AGGRESSIVE_BACKUP = BackupSchedule(interval_seconds=300, max_snapshots=20)  # Every 5 min (demo)
+# Default schedule, set with CIPHERTRAP_BACKUP_INTERVAL (seconds, default 600)
+DEFAULT_BACKUP = BackupSchedule(interval_seconds=BACKUP_INTERVAL_SECONDS)
 
 
 def calculate_next_backup_time(scheduler: SnapshotScheduler) -> datetime:

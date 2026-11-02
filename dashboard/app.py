@@ -30,7 +30,8 @@ from core.honeyfiles import deploy_honeyfiles, check_honeyfile_integrity
 from core.integrity import AuditLog
 from core.snapshot import list_snapshots
 from core.threat_intelligence import detect_malware_signature, is_likely_encrypted
-from core.auto_backup import SnapshotScheduler, HOURLY_BACKUP
+from core.auto_backup import SnapshotScheduler, DEFAULT_BACKUP
+from core.config import get_vault_password
 
 app = Flask(__name__)
 
@@ -143,12 +144,12 @@ def init_monitoring(folder: str, vault_folder: str, enable_auto_backup: bool = F
     
     # Initialize auto-backup scheduler (optional)
     if enable_auto_backup:
-        scheduler = SnapshotScheduler(HOURLY_BACKUP)
-        scheduler.start(folder_path, vault_path)
+        scheduler = SnapshotScheduler(DEFAULT_BACKUP)
+        scheduler.start(folder_path, vault_path, get_vault_password())
         state["scheduler"] = scheduler
         state["audit_log"].append("auto_backup_enabled", {
-            "interval": "hourly",
-            "max_snapshots": HOURLY_BACKUP.max_snapshots
+            "interval_seconds": DEFAULT_BACKUP.interval_seconds,
+            "max_snapshots": DEFAULT_BACKUP.max_snapshots
         })
 
     threading.Thread(target=_background_scorer, daemon=True).start()

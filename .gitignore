@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# CipherTrap runtime data
+vault/
+logs/
+my_important_files/
+my_important_files_restored/
+demo_folder/
+demo_folder_restored/
+
+# Local environment
+.env
+.venv/

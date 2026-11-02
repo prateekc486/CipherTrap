@@ -136,7 +136,7 @@ for i in range(5):
 snapshot = create_snapshot(
     source_folder='demo_folder',
     vault_folder='vault',
-    password='recovery_password_123'
+    password=os.environ["CIPHERTRAP_VAULT_PASSWORD"]
 )
 print(f'✅ Snapshot created: {snapshot.snapshot_id}')
 print(f'✅ Files backed up: {len(snapshot.files)}')
@@ -159,7 +159,7 @@ result = restore_snapshot(
     vault_folder='vault',
     snapshot_id='snap_a1b2c3d4e5f6',  # Use the ID from backup
     destination_folder='demo_folder_restored',
-    password='recovery_password_123'
+    password=os.environ["CIPHERTRAP_VAULT_PASSWORD"]
 )
 
 print(f'✅ RECOVERY SUCCESSFUL!')
