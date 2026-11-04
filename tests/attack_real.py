@@ -13,6 +13,7 @@ Usage:
     python tests/attack_real.py
 """
 
+import argparse
 import hashlib
 import os
 import shutil
@@ -28,14 +29,17 @@ from core.config import VAULT_DIR, get_vault_password
 from core.recovery import restore_snapshot
 from core.snapshot import create_snapshot
 
-SOURCE = Path("my_important_files")
-
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Attack your original files (with a verified backup first).")
+    parser.add_argument("folder", nargs="?", default="my_important_files", help="folder to attack")
+    args = parser.parse_args()
+    SOURCE = Path(args.folder).expanduser().resolve()
+
     if not SOURCE.is_dir():
         sys.exit(f"Error: {SOURCE} not found.")
     files = [p for p in SOURCE.rglob("*") if p.is_file()]
@@ -44,7 +48,7 @@ def main() -> None:
 
     password = get_vault_password()
 
-    print(f"WARNING: this encrypts the {len(files)} ORIGINAL file(s) in {SOURCE}\\.")
+    print(f"WARNING: this encrypts the {len(files)} ORIGINAL file(s) in {SOURCE}.")
     if input("Type YES to continue: ").strip() != "YES":
         sys.exit("Cancelled. Nothing was changed.")
 

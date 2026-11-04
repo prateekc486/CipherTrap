@@ -8,6 +8,7 @@ Usage:
     python tests/attack_copy.py
 """
 
+import argparse
 import os
 import shutil
 import sys
@@ -17,13 +18,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from simulate_attack import DEMO_MARKER, encrypt_file
 
-SOURCE = Path("my_important_files")
 TARGET = Path("attack_test")
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Attack a copy of a folder (originals untouched).")
+    parser.add_argument("folder", nargs="?", default="my_important_files", help="folder to copy and attack")
+    args = parser.parse_args()
+    SOURCE = Path(args.folder).expanduser().resolve()
+
     if not SOURCE.is_dir():
         sys.exit(f"Error: {SOURCE} not found. Create it and add a file first.")
+    if SOURCE == TARGET.resolve():
+        sys.exit("Error: choose your real folder, not the attack_test copy.")
 
     if TARGET.exists():
         shutil.rmtree(TARGET)
